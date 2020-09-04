@@ -1,3 +1,5 @@
+from imgurpython.helpers.error import ImgurClientRateLimitError
+
 from imgur.auth import get_imgur_client
 
 
@@ -18,13 +20,12 @@ def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, wi
         print(f'Uploading image {img_path} to imgur ')
         image = client.upload_from_path(img_path, config=config, anon=False)
         return image['link']
-    except Exception as e:
-        # TODO implement retry retry strategy
-        raise e
-        print('An error occurred when uploading a file to IMGUR')
+    except ImgurClientRateLimitError as e:
+        print(e)
+        print('Your temporary credentials are no longer valid')
         print('Please reauthenticate...')
-        upload_img_to_imgur(img_name=img_name,
-                            img_path=img_path,
-                            img_description=img_description,
-                            album=album,
-                            with_auth=True)
+        return upload_img_to_imgur(img_name=img_name,
+                                   img_path=img_path,
+                                   img_description=img_description,
+                                   album=album,
+                                   with_auth=True)
