@@ -1,11 +1,11 @@
 from imgurpython import ImgurClient
-from screenshots_to_web.imgur.api_keys import CLIENT_ID, CLIENT_SECRET
+from imgur.api_keys import CLIENT_ID, CLIENT_SECRET
 
 
-def get_imgur_client(skip_auth: bool = True) -> ImgurClient:
+def get_imgur_client(with_auth: bool = True) -> ImgurClient:
     client = ImgurClient(CLIENT_ID, CLIENT_SECRET)
 
-    if skip_auth:
+    if not with_auth:
         access_token = 'access_token'
         refresh_token = 'refresh_token'
     else:
