@@ -10,10 +10,7 @@ def main():
     img_path = f'{img_name}.png'
     take_screenshot(img_path)
 
-    if access_keys_exist():
-        url = upload_img_to_imgur(img_name, img_path, with_auth=False)
-    else:
-        url = upload_img_to_imgur(img_name, img_path, with_auth=True)
+    url = upload_img_to_imgur(img_name, img_path, read_new_keys=False)
 
     copy_to_clipboard(url)
     remove_file(img_path)

@@ -7,8 +7,8 @@ def access_keys_exist():
     return True
 
 
-def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, with_auth=False):
-    client = get_imgur_client(with_auth=with_auth)
+def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, read_new_keys=False):
+    client = get_imgur_client(read_new_keys=read_new_keys)
     try:
         config = {
             'album': album,
@@ -28,4 +28,4 @@ def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, wi
                                    img_path=img_path,
                                    img_description=img_description,
                                    album=album,
-                                   with_auth=True)
+                                   read_new_keys=True)
