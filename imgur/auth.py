@@ -1,3 +1,5 @@
+from json import JSONDecodeError
+
 from imgurpython import ImgurClient
 from imgurpython.helpers.error import ImgurClientError
 
@@ -10,22 +12,18 @@ from utils.system_utils import is_file
 def get_access_keys_dict():
     if is_file(IMGUR):
         with open(IMGUR) as json_file:
-            return json.load(json_file)
+            try:
+                return json.load(json_file)
+            except JSONDecodeError as e:
+                print(e)
+                return {}
     else:
         return {}
 
 
-def read_access_keys_from_user():
-    pass
-
-
-def read_pin_from_client():
-    pass
-
-
 def write_access_keys(access_keys):
     with open(IMGUR, 'w') as outfile:
-        json.dump(access_keys, outfile)
+        json.dump(access_keys, outfile, indent=2)
 
 
 def access_keys_are_configured(access_keys):
@@ -50,8 +48,8 @@ def extract_client_keys(access_keys_dict, read_new_keys):
     return client_id, client_secret
 
 
-def extract_tokens(access_keys_dict, client, read_new_keys):
-    if not read_new_keys and tokens_are_configured(access_keys_dict):
+def extract_tokens(access_keys_dict, client, read_new_token):
+    if not read_new_token and tokens_are_configured(access_keys_dict):
         access_token = access_keys_dict[ACCESS_TOKEN]
         refresh_token = access_keys_dict[REFRESH_TOKEN]
     else:
@@ -66,21 +64,29 @@ def extract_tokens(access_keys_dict, client, read_new_keys):
     return access_token, refresh_token
 
 
-def get_imgur_client(read_new_keys=False) -> ImgurClient:
+def get_imgur_client(read_new_client=False, read_new_token=False) -> ImgurClient:
     access_keys_dict = get_access_keys_dict()
-    client_id, client_secret = extract_client_keys(access_keys_dict, read_new_keys)
+    client_id, client_secret = extract_client_keys(access_keys_dict, read_new_client)
 
     try:
         client = ImgurClient(client_id=client_id, client_secret=client_secret)
     except ImgurClientError as e:
         print(e)
         print('Invalid credentials supplied. Let\'s try again :)')
-        client = get_imgur_client(read_new_keys=True)
+        return get_imgur_client(read_new_client=True, read_new_token=read_new_token)
 
-    access_token, refresh_token = extract_tokens(access_keys_dict, client, read_new_keys)
+    access_token, refresh_token = extract_tokens(access_keys_dict, client, read_new_token)
 
     print("Authentication successful! Here are the details:")
     print("   Access token:  {0}".format(access_token))
     print("   Refresh token: {0}".format(refresh_token))
     client.set_user_auth(access_token, refresh_token)
+
+    write_access_keys({
+        CLIENT_ID: client_id,
+        CLIENT_SECRET: client_secret,
+        ACCESS_TOKEN: access_token,
+        REFRESH_TOKEN: refresh_token
+    })
+
     return client

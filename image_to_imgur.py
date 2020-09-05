@@ -3,12 +3,9 @@ from imgurpython.helpers.error import ImgurClientRateLimitError
 from imgur.auth import get_imgur_client
 
 
-def access_keys_exist():
-    return True
-
-
-def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, read_new_keys=False):
-    client = get_imgur_client(read_new_keys=read_new_keys)
+def upload_img_to_imgur(img_name, img_path, img_description=None, album=None,
+                        read_new_client=False, read_new_token=False):
+    client = get_imgur_client(read_new_client=read_new_client, read_new_token=read_new_token)
     try:
         config = {
             'album': album,
@@ -28,4 +25,5 @@ def upload_img_to_imgur(img_name, img_path, img_description=None, album=None, re
                                    img_path=img_path,
                                    img_description=img_description,
                                    album=album,
-                                   read_new_keys=True)
+                                   read_new_client=False,
+                                   read_new_token=True)
